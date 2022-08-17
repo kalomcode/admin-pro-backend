@@ -1,4 +1,5 @@
 ﻿/*
+    Usuarios
     Ruta: /api/usuarios
 */
 
@@ -7,7 +8,6 @@ const { check } = require('express-validator');
 const { validarCampos } = require('../middlewares/validar-campos');
 
 const UsuariosCtr = require('../controllers/usuarios.controller');
-const { route } = require('express/lib/application');
 const { validarJWT } = require('../middlewares/validar-jwt');
 
 const router = Router();
