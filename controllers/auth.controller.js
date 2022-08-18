@@ -1,5 +1,6 @@
 ﻿const bcrypt = require("bcryptjs/dist/bcrypt");
 const { response } = require("express");
+const { googleVerify } = require("../helpers/google-verify");
 const { generarJWT } = require("../helpers/jwt");
 
 const Usuario = require('../models/usuario.model')
@@ -46,6 +47,48 @@ const login = async ( req, res = response ) => {
     }
 }
 
+const googleSingIn = async( req, res = response ) => {
+
+    try {
+        const { email, name, picture } = await googleVerify( req.body.token );
+
+        const usuarioDB = await Usuario.findOne({ email });
+        let usuario;
+
+        if ( !usuarioDB ) {
+            usuario = new Usuario({
+                nombre: name,
+                email,
+                password: '@@@',
+                img: picture,
+                google: true
+            })
+        } else {
+            usuario = usuarioDB;
+            usuario.google = true;
+        }
+
+        // Guardar Usuario
+        await usuario.save();
+
+        // Generar el token
+        const token = await generarJWT( usuario.id )
+        
+        res.json({
+            ok: true,
+            token
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({
+            ok: false,
+            msg: 'Token de google no es correcto'
+        })
+    }    
+
+}
+
 module.exports = {
-    login
+    login,
+    googleSingIn,
 }
