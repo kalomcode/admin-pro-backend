@@ -67,7 +67,7 @@ const googleSingIn = async( req, res = response ) => {
             usuario = usuarioDB;
             usuario.google = true;
         }
-
+        
         // Guardar Usuario
         await usuario.save();
 
@@ -76,7 +76,10 @@ const googleSingIn = async( req, res = response ) => {
         
         res.json({
             ok: true,
-            token
+            token,
+            email,
+            name,
+            picture
         })
     } catch (error) {
         console.log(error);
@@ -95,9 +98,13 @@ const renewToken = async( req, res = response) => {
     // Generar el token
     const token = await generarJWT( uid )
 
+    // Obtener el usuario por UID
+    const usuarioDB = await Usuario.findById( uid );
+
     res.json({
-        ok: false,
-        uid
+        ok: true,
+        token,
+        usuario: usuarioDB,
     })
 }
 
